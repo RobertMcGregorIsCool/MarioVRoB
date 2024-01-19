@@ -36,6 +36,10 @@ private:
 	sf::Text m_welcomeMessage; // text used for message on screen
 	sf::Texture m_logoTexture; // texture used for sfml logo
 	sf::Sprite m_logoSprite; // sprite used for sfml logo
+
+	sf::Texture m_marioTexture;	// texture used for image of mario and luigi
+	sf::Sprite m_marioSprite;	// sprite used for marioLuigi
+
 	bool m_exitGame; // control exiting game
 
 };

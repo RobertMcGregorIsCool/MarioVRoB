@@ -113,6 +113,9 @@ void Game::render()
 	m_window.clear(sf::Color::White);
 	m_window.draw(m_welcomeMessage);
 	m_window.draw(m_logoSprite);
+
+	m_window.draw(m_marioSprite);
+
 	m_window.display();
 }
 
@@ -146,6 +149,15 @@ void Game::setupSprite()
 		// simple error message if previous call fails
 		std::cout << "problem loading logo" << std::endl;
 	}
+
+	if (!m_marioTexture.loadFromFile("ASSETS\\IMAGES\\mario-luigi-64.png"))
+	{// Simple error message if previous call fails
+		std::cout << "problem loading logo" << std::endl;
+	}
+
+	m_marioSprite.setTexture(m_marioTexture);
+	m_marioSprite.setPosition(300.0f, 180.0f);
+
 	m_logoSprite.setTexture(m_logoTexture);
 	m_logoSprite.setPosition(300.0f, 180.0f);
 }
