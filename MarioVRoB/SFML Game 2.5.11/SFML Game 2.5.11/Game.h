@@ -11,6 +11,16 @@
 /// </summary>
 #include <SFML/Graphics.hpp>
 
+enum class Direction
+{
+	None,
+	Up,
+	Down,
+	Left,
+	Right
+};
+
+
 class Game
 {
 public:
