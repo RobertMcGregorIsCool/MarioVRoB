@@ -20,7 +20,6 @@ enum class Direction
 	Right
 };
 
-
 class Game
 {
 public:
@@ -37,20 +36,24 @@ private:
 	void processKeys(sf::Event t_event);
 	void update(sf::Time t_deltaTime);
 	void render();
-	
+	void move();
+
+	void checkDirection();
 	void setupFontAndText();
 	void setupSprite();
 
-	sf::RenderWindow m_window; // main SFML window
-	sf::Font m_ArialBlackfont; // font used by message
-	sf::Text m_welcomeMessage; // text used for message on screen
-	sf::Texture m_logoTexture; // texture used for sfml logo
-	sf::Sprite m_logoSprite; // sprite used for sfml logo
+	sf::RenderWindow	m_window; // main SFML window
+	sf::Font			m_ArialBlackfont; // font used by message
+	sf::Text			m_welcomeMessage; // text used for message on screen
+	sf::Texture			m_logoTexture; // texture used for sfml logo
+	sf::Sprite			m_logoSprite; // sprite used for sfml logo
 
-	sf::Texture m_marioTexture;	// texture used for image of mario and luigi
-	sf::Sprite m_marioSprite;	// sprite used for marioLuigi
+	sf::Texture			m_marioTexture;	// texture used for image of mario and luigi
+	sf::Sprite			m_marioSprite;	// sprite used for marioLuigi
 
-	bool m_exitGame; // control exiting game
+	sf::Vector2f		m_location{ 400.0f, 200.0f }; // Mario's position. I dig how explicit the Vector types are.
+	Direction			m_direction = Direction::None; // Where is mario going
+	bool				m_exitGame; // control exiting game
 
 };
 

@@ -2,7 +2,7 @@
 /// @author RoBert McGregor
 /// @date Jan 2024
 ///
-/// you need to change the above lines or lose marks
+/// you need to change the above lines or lose marks <= Roger, wilco.
 /// </summary>
 
 #include "Game.h"
@@ -14,7 +14,7 @@
 /// default constructor
 /// setup the window properties
 /// load and setup the text 
-/// load and setup thne image
+/// load and setup the image
 /// </summary>
 Game::Game() :
 	m_window{ sf::VideoMode{ 800U, 600U, 32U }, "SFML Game" },
@@ -26,7 +26,7 @@ Game::Game() :
 
 /// <summary>
 /// default destructor we didn't dynamically allocate anything
-/// so we don't need to free it, but mthod needs to be here
+/// so we don't need to free it, but method needs to be here
 /// </summary>
 Game::~Game()
 {
@@ -103,6 +103,8 @@ void Game::update(sf::Time t_deltaTime)
 	{
 		m_window.close();
 	}
+	checkDirection();
+	move();
 }
 
 /// <summary>
@@ -117,6 +119,38 @@ void Game::render()
 	m_window.draw(m_marioSprite);
 
 	m_window.display();
+}
+
+void Game::move()
+{
+	sf::Vector2f movement{ 0.0f, 0.0f };
+	switch (m_direction)
+	{
+	case Direction::None:
+		break;
+	case Direction::Up:
+		movement.y = -1.5f;
+		break;
+	case Direction::Down:
+		break;
+	case Direction::Left:
+		break;
+	case Direction::Right:
+		break;
+	default:
+		break;
+	}
+	m_location += movement;
+	m_marioSprite.setPosition(m_location);
+}
+
+void Game::checkDirection()
+{
+	m_direction = Direction::None;
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+	{
+		m_direction = Direction::Up;
+	}
 }
 
 /// <summary>
@@ -156,7 +190,8 @@ void Game::setupSprite()
 	}
 
 	m_marioSprite.setTexture(m_marioTexture);
-	m_marioSprite.setPosition(300.0f, 180.0f);
+	m_marioSprite.setPosition(m_location);
+	m_marioSprite.setTextureRect(sf::IntRect(0, 0, 64, 148));
 
 	m_logoSprite.setTexture(m_logoTexture);
 	m_logoSprite.setPosition(300.0f, 180.0f);
