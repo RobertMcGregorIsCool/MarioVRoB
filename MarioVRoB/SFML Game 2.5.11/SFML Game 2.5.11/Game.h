@@ -1,6 +1,10 @@
 /// <summary>
-/// author Pete Lowe May 2019
-/// you need to change the above line or lose marks
+/// @author RoBert McGregor LOGIN: c00302210
+/// START:  19th Jan 2024	END: ???
+/// EST:	4 hours?		ACTUAL:
+/// KNOWN BUGS: 
+///
+/// you need to change the above lines or lose marks <= Roger, wilco.
 /// </summary>
 #ifndef GAME_HPP
 #define GAME_HPP
@@ -10,6 +14,7 @@
 /// Don't forget the endif at the bottom
 /// </summary>
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 
 enum class Direction
 {
@@ -41,12 +46,15 @@ private:
 	void checkDirection();
 	void setupFontAndText();
 	void setupSprite();
+	void setupSounds();
 	void changeCharacter();
+
+	void centerText();
 
 	const float			m_moveSpeed = 1.5f; // Player movement speed - maybe other things too?
 
 	sf::RenderWindow	m_window; // main SFML window
-	sf::Font			m_ArialBlackfont; // font used by message
+	sf::Font			m_mariofont; // font used by message
 	sf::Text			m_characterName; // ROB: Hmm. Change from Pete's first version here?
 	sf::Text			m_welcomeMessage; // text used for message on screen
 	sf::Texture			m_logoTexture; // texture used for sfml logo
@@ -62,6 +70,9 @@ private:
 	Direction			m_direction = Direction::None; // Where is mario going
 	bool				m_exitGame; // control exiting game
 
+	sf::SoundBuffer		m_snd_exclaimMario;
+	sf::SoundBuffer		m_snd_exclaimLuigi;
+	sf::Sound			m_soundSource_charName;
 };
 
 #endif // !GAME_HPP

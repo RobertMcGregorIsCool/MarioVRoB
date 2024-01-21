@@ -1,6 +1,8 @@
 /// <summary>
-/// @author RoBert McGregor
-/// @date Jan 2024
+/// @author RoBert McGregor LOGIN: c00302210
+/// START:  19th Jan 2024	END: ???
+/// EST:	4 hours?		ACTUAL:
+/// KNOWN BUGS: 
 ///
 /// you need to change the above lines or lose marks <= Roger, wilco.
 /// </summary>
@@ -17,11 +19,12 @@
 /// load and setup the image
 /// </summary>
 Game::Game() :
-	m_window{ sf::VideoMode{ 800U, 600U, 32U }, "SFML Game" },
+	m_window{ sf::VideoMode{ 800U, 600U, 32U }, "I SEE YOU" },
 	m_exitGame{false} //when true game will exit
 {
 	setupFontAndText(); // load font 
 	setupSprite(); // load texture
+	setupSounds(); // Load sounds, prep speaker.
 }
 
 /// <summary>
@@ -117,7 +120,8 @@ void Game::update(sf::Time t_deltaTime)
 void Game::render()
 {
 	m_window.clear(sf::Color::White);
-	m_window.draw(m_welcomeMessage);
+	//m_window.draw(m_welcomeMessage);
+	m_window.draw(m_characterName);
 	m_window.draw(m_logoSprite);
 
 	m_window.draw(m_marioSprite);
@@ -133,16 +137,28 @@ void Game::move()
 	case Direction::None:
 		break;
 	case Direction::Up:
-		movement.y = -m_moveSpeed;
+		if (m_location.y + (m_marioSprite.getLocalBounds().height * 0.8f) > 0.0f)
+		{
+			movement.y = -m_moveSpeed;
+		}
 		break;
 	case Direction::Down:
-		movement.y = m_moveSpeed;
+		if (m_location.y + (m_marioSprite.getLocalBounds().height * 0.2f) < m_window.getSize().y)
+		{
+			movement.y = m_moveSpeed;
+		}
 		break;
 	case Direction::Left:
-		movement.x = -m_moveSpeed;
+		if (m_location.x + (m_marioSprite.getLocalBounds().width * 0.5f) > 0.0f)
+		{
+			movement.x = -m_moveSpeed;
+		}
 		break;
 	case Direction::Right:
-		movement.x = m_moveSpeed;
+		if (m_location.x + (m_marioSprite.getLocalBounds().width * 0.5f) < m_window.getSize().x)
+		{
+			movement.x = m_moveSpeed;
+		}
 		break;
 	default:
 		break;
@@ -177,19 +193,18 @@ void Game::checkDirection()
 /// </summary>
 void Game::setupFontAndText()
 {
-	if (!m_ArialBlackfont.loadFromFile("ASSETS\\FONTS\\ariblk.ttf"))
+	if (!m_mariofont.loadFromFile("ASSETS\\FONTS\\SuperMario256.ttf"))
 	{
-		std::cout << "problem loading arial black font" << std::endl;
+		std::cout << "problem loading SuperMario256 font" << std::endl;
 	}
-	m_welcomeMessage.setFont(m_ArialBlackfont);
-	m_welcomeMessage.setString("SFML Game");
-	m_welcomeMessage.setStyle(sf::Text::Underlined | sf::Text::Italic | sf::Text::Bold);
-	m_welcomeMessage.setPosition(40.0f, 40.0f);
-	m_welcomeMessage.setCharacterSize(80U);
-	m_welcomeMessage.setOutlineColor(sf::Color::Red);
-	m_welcomeMessage.setFillColor(sf::Color::Black);
-	m_welcomeMessage.setOutlineThickness(3.0f);
-
+	m_characterName.setFont(m_mariofont);
+	m_characterName.setString("Mario");
+	m_characterName.setStyle(sf::Text::Underlined | sf::Text::Italic | sf::Text::Bold);
+	m_characterName.setPosition(40.0f, 40.0f);
+	m_characterName.setCharacterSize(80U);
+	m_characterName.setOutlineColor(sf::Color::Red);
+	m_characterName.setFillColor(sf::Color::Black);
+	m_characterName.setOutlineThickness(3.0f);
 }
 
 /// <summary>
@@ -216,6 +231,21 @@ void Game::setupSprite()
 	m_logoSprite.setPosition(300.0f, 180.0f); // So I need to change this stuff so the text follows the character around.
 }
 
+void Game::setupSounds()
+{
+	if (!m_snd_exclaimMario.loadFromFile("ASSETS\\SOUNDS\\mario.wav"))
+	{// Simple error message if load fails.
+		std::cout << "Failed to load 'mario.wav'\n";
+	}
+
+	if (!m_snd_exclaimLuigi.loadFromFile("ASSETS\\SOUNDS\\luigi.wav"))
+	{// Simple error message if load fails.
+		std::cout << "Failed to load 'luigi.wav'\n";
+	}
+
+	m_soundSource_charName.setBuffer(m_snd_exclaimMario);
+}
+
 void Game::changeCharacter()
 {
 	m_ImMario = !m_ImMario; // Toggle whether you are or are not Mario.
@@ -223,13 +253,30 @@ void Game::changeCharacter()
 	{
 		m_characterName.setString("Mario");
 		m_characterName.setFillColor(sf::Color::Red);
-		m_marioSprite.setTextureRect(sf::IntRect{ 0,0,64,148 });
-		// centerText(); Oops, not using this yet.
+		m_characterName.setOutlineColor(sf::Color::Green);
+		m_marioSprite.setTextureRect(sf::IntRect{ 0,0,64,148 }); // Mario is to left of 128 width texture, so rect starts at x0.
+		centerText();
+
+		m_soundSource_charName.setBuffer(m_snd_exclaimMario);
+		m_soundSource_charName.play();
 	}
 	else
 	{
 		m_characterName.setString("Luigi");
 		m_characterName.setFillColor(sf::Color::Green);
-		m_marioSprite.setTextureRect(sf::IntRect{ 64,0,64,148 });
+		m_characterName.setOutlineColor(sf::Color::Red);
+		m_marioSprite.setTextureRect(sf::IntRect{ 64,0,64,148 });// Luigi is to right of 128 width texture, so rect starts at x64 (hor middle).
+		centerText();
+
+		m_soundSource_charName.setBuffer(m_snd_exclaimLuigi);
+		m_soundSource_charName.play();
 	}
+}
+
+void Game::centerText()
+{
+	sf::Vector2f location{ 0.0f, 0.0f };
+	location.y = 50.0f;
+	location.x = 400 - (m_characterName.getGlobalBounds().width / 2);
+	m_characterName.setPosition(location);
 }

@@ -1,8 +1,10 @@
 /// <summary>
-/// simple game loop for SFML[2.5.1]
-/// 
-/// @author Peter Lowe
-/// @date May 2019
+/// @author RoBert McGregor LOGIN: c00302210
+/// START:  19th Jan 2024	END: ???
+/// EST:	4 hours?		ACTUAL:
+/// KNOWN BUGS: 
+///
+/// you need to change the above lines or lose marks <= Roger, wilco.
 /// </summary>
 
 #ifdef _DEBUG 
