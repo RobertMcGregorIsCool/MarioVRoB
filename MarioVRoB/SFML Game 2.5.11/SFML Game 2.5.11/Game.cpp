@@ -129,13 +129,16 @@ void Game::move()
 	case Direction::None:
 		break;
 	case Direction::Up:
-		movement.y = -1.5f;
+		movement.y = -m_moveSpeed;
 		break;
 	case Direction::Down:
+		movement.y = m_moveSpeed;
 		break;
 	case Direction::Left:
+		movement.x = -m_moveSpeed;
 		break;
 	case Direction::Right:
+		movement.x = m_moveSpeed;
 		break;
 	default:
 		break;
@@ -150,6 +153,18 @@ void Game::checkDirection()
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 	{
 		m_direction = Direction::Up;
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+	{
+		m_direction = Direction::Down;
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+	{
+		m_direction = Direction::Left;
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+	{
+		m_direction = Direction::Right;
 	}
 }
 

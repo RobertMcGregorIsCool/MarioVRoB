@@ -42,6 +42,8 @@ private:
 	void setupFontAndText();
 	void setupSprite();
 
+	const float			m_moveSpeed = 1.5f; // Player movement speed - maybe other things too?
+
 	sf::RenderWindow	m_window; // main SFML window
 	sf::Font			m_ArialBlackfont; // font used by message
 	sf::Text			m_welcomeMessage; // text used for message on screen
