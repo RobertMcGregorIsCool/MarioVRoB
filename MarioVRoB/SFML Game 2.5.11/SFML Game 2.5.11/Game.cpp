@@ -91,6 +91,10 @@ void Game::processKeys(sf::Event t_event)
 	{
 		m_exitGame = true;
 	}
+	if (sf::Keyboard::Space == t_event.key.code)
+	{
+		changeCharacter();
+	}
 }
 
 /// <summary>
@@ -201,7 +205,7 @@ void Game::setupSprite()
 
 	if (!m_marioTexture.loadFromFile("ASSETS\\IMAGES\\mario-luigi-64.png"))
 	{// Simple error message if previous call fails
-		std::cout << "problem loading logo" << std::endl;
+		std::cout << "problem loading italian plumbers" << std::endl;
 	}
 
 	m_marioSprite.setTexture(m_marioTexture);
@@ -209,5 +213,23 @@ void Game::setupSprite()
 	m_marioSprite.setTextureRect(sf::IntRect(0, 0, 64, 148));
 
 	m_logoSprite.setTexture(m_logoTexture);
-	m_logoSprite.setPosition(300.0f, 180.0f);
+	m_logoSprite.setPosition(300.0f, 180.0f); // So I need to change this stuff so the text follows the character around.
+}
+
+void Game::changeCharacter()
+{
+	m_ImMario = !m_ImMario; // Toggle whether you are or are not Mario.
+	if (m_ImMario)
+	{
+		m_characterName.setString("Mario");
+		m_characterName.setFillColor(sf::Color::Red);
+		m_marioSprite.setTextureRect(sf::IntRect{ 0,0,64,148 });
+		// centerText(); Oops, not using this yet.
+	}
+	else
+	{
+		m_characterName.setString("Luigi");
+		m_characterName.setFillColor(sf::Color::Green);
+		m_marioSprite.setTextureRect(sf::IntRect{ 64,0,64,148 });
+	}
 }

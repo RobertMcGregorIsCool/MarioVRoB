@@ -41,11 +41,13 @@ private:
 	void checkDirection();
 	void setupFontAndText();
 	void setupSprite();
+	void changeCharacter();
 
 	const float			m_moveSpeed = 1.5f; // Player movement speed - maybe other things too?
 
 	sf::RenderWindow	m_window; // main SFML window
 	sf::Font			m_ArialBlackfont; // font used by message
+	sf::Text			m_characterName; // ROB: Hmm. Change from Pete's first version here?
 	sf::Text			m_welcomeMessage; // text used for message on screen
 	sf::Texture			m_logoTexture; // texture used for sfml logo
 	sf::Sprite			m_logoSprite; // sprite used for sfml logo
@@ -54,6 +56,9 @@ private:
 	sf::Sprite			m_marioSprite;	// sprite used for marioLuigi
 
 	sf::Vector2f		m_location{ 400.0f, 200.0f }; // Mario's position. I dig how explicit the Vector types are.
+	sf::Vector2f		m_spriteOffset{ 32.0f, 74.0f };
+	bool				m_ImMario{ true }; // Why is THIS in curly braces?
+
 	Direction			m_direction = Direction::None; // Where is mario going
 	bool				m_exitGame; // control exiting game
 
