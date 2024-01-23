@@ -55,7 +55,7 @@ private:
 
 	sf::RenderWindow	m_window; // main SFML window
 	sf::Font			m_mariofont; // font used by message
-	sf::Text			m_characterName; // ROB: Hmm. Change from Pete's first version here?
+	sf::Text			m_characterName; // ROB: Hmm. Change from Pete's first version (ie. Github) here?
 	sf::Text			m_welcomeMessage; // text used for message on screen
 	sf::Texture			m_logoTexture; // texture used for sfml logo
 	sf::Sprite			m_logoSprite; // sprite used for sfml logo
@@ -63,7 +63,8 @@ private:
 	sf::Texture			m_marioTexture;	// texture used for image of mario and luigi
 	sf::Sprite			m_marioSprite;	// sprite used for marioLuigi
 
-	sf::Vector2f		m_location{ 400.0f, 200.0f }; // Mario's position. I dig how explicit the Vector types are.
+	// sf::Vector2f		m_location{ 20.0f, 10.0f }; // Mario's position. I dig how explicit the Vector types are.
+	sf::Vector2f		m_location{ 20.0f, 550.0f }; // Mario's position. I dig how explicit the Vector types are.
 	sf::Vector2f		m_spriteOffset{ 32.0f, 74.0f };
 	bool				m_ImMario{ true }; // Why is THIS in curly braces?
 
@@ -73,6 +74,9 @@ private:
 	sf::SoundBuffer		m_snd_exclaimMario;
 	sf::SoundBuffer		m_snd_exclaimLuigi;
 	sf::Sound			m_soundSource_charName;
+
+	sf::RectangleShape	m_rectangleShape;
+	sf::RectangleShape	m_rectDebug;
 };
 
 #endif // !GAME_HPP

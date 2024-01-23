@@ -120,11 +120,18 @@ void Game::update(sf::Time t_deltaTime)
 void Game::render()
 {
 	m_window.clear(sf::Color::White);
-	//m_window.draw(m_welcomeMessage);
+	//m_window.draw(m_welcomeMessage); // Get rid of this before Pete sees it!
+
+	
+
 	m_window.draw(m_characterName);
-	m_window.draw(m_logoSprite);
+	// m_window.draw(m_logoSprite);
+
+	m_window.draw(m_rectangleShape);
 
 	m_window.draw(m_marioSprite);
+
+	m_window.draw(m_rectDebug); // Turn this off when I've found the right values.
 
 	m_window.display();
 }
@@ -132,32 +139,63 @@ void Game::render()
 void Game::move()
 {
 	sf::Vector2f movement{ 0.0f, 0.0f };
+	float playerBot = m_location.y + (m_marioSprite.getLocalBounds().height * 0.85f);
+	float playerTop = m_location.y + (m_marioSprite.getLocalBounds().height * 0.4f);
+	float playerLeft = m_location.x + (m_marioSprite.getLocalBounds().width * 0.25f);
+	float playerRigt = m_location.x + (m_marioSprite.getLocalBounds().width * 0.75f);
+
+	float rectTop = m_rectangleShape.getGlobalBounds().top;
+	float rectBot = rectTop + m_rectangleShape.getGlobalBounds().height;
+	float rectLeft = m_rectangleShape.getGlobalBounds().left;
+	float rectRigt = rectLeft + m_rectangleShape.getGlobalBounds().width;
+
+
 	switch (m_direction)
 	{
 	case Direction::None:
 		break;
 	case Direction::Up:
-		if (m_location.y + (m_marioSprite.getLocalBounds().height * 0.8f) > 0.0f)
+		if (playerBot > 0.0f)
 		{
-			movement.y = -m_moveSpeed;
+			if (!((playerBot < rectBot && playerBot > rectTop) && (playerLeft > rectLeft && playerRigt < rectRigt)))
+			{
+				movement.y = -m_moveSpeed;
+			}
+			else
+			{
+				std::cout << "You sonova bitch, you did it!\n";
+				m_location = sf::Vector2f(m_marioSprite.getPosition().x, rectBot - (m_marioSprite.getLocalBounds().height * 0.838f));
+			}
 		}
 		break;
 	case Direction::Down:
-		if (m_location.y + (m_marioSprite.getLocalBounds().height * 0.2f) < m_window.getSize().y)
+		if (playerTop < m_window.getSize().y)
 		{
-			movement.y = m_moveSpeed;
+			if (!((playerBot < rectBot && playerBot > rectTop) && (playerLeft > rectLeft && playerRigt < rectRigt)))
+			{
+				movement.y = m_moveSpeed;
+			}
+			
 		}
 		break;
 	case Direction::Left:
-		if (m_location.x + (m_marioSprite.getLocalBounds().width * 0.5f) > 0.0f)
+		if (playerLeft > 0.0f)
 		{
-			movement.x = -m_moveSpeed;
+			if (!((playerBot < rectBot && playerBot > rectTop) && (playerLeft > rectLeft && playerRigt < rectRigt)))
+			{
+				movement.x = -m_moveSpeed;
+			}
+			
 		}
 		break;
 	case Direction::Right:
-		if (m_location.x + (m_marioSprite.getLocalBounds().width * 0.5f) < m_window.getSize().x)
+		if (playerRigt< m_window.getSize().x)
 		{
-			movement.x = m_moveSpeed;
+			if (!((playerBot < rectBot && playerBot > rectTop) && (playerLeft > rectLeft && playerRigt < rectRigt)))
+			{
+				movement.x = m_moveSpeed;
+			}
+			
 		}
 		break;
 	default:
@@ -229,6 +267,14 @@ void Game::setupSprite()
 
 	m_logoSprite.setTexture(m_logoTexture);
 	m_logoSprite.setPosition(300.0f, 180.0f); // So I need to change this stuff so the text follows the character around.
+
+	m_rectangleShape.setSize(sf::Vector2f(256.0f, 256.0f));
+	m_rectangleShape.setPosition((m_window.getSize().x * 0.5f) - m_rectangleShape.getSize().x * 0.5f, (m_window.getSize().y * 0.5f) - m_rectangleShape.getSize().y * 0.5f);
+	m_rectangleShape.setFillColor(sf::Color::Cyan);
+
+	m_rectDebug.setSize(sf::Vector2f(256.0f, 4.0f));
+	m_rectDebug.setPosition((m_window.getSize().x * 0.5f) - m_rectDebug.getSize().x * 0.5f, m_rectangleShape.getGlobalBounds().top + m_rectangleShape.getGlobalBounds().height);
+	m_rectDebug.setFillColor(sf::Color::Red);
 }
 
 void Game::setupSounds()
