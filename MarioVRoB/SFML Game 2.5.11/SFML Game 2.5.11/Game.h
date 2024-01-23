@@ -51,6 +51,8 @@ private:
 
 	void centerText();
 
+	//bool collidingWithBounds();
+
 	const float			m_moveSpeed = 1.5f; // Player movement speed - maybe other things too?
 
 	sf::RenderWindow	m_window; // main SFML window
@@ -65,6 +67,7 @@ private:
 
 	// sf::Vector2f		m_location{ 20.0f, 10.0f }; // Mario's position. I dig how explicit the Vector types are.
 	sf::Vector2f		m_location{ 20.0f, 550.0f }; // Mario's position. I dig how explicit the Vector types are.
+	sf::Vector2f		m_lastValidPos{ 0.0f, 0.0f }; // Last valid position while not touching collider.
 	sf::Vector2f		m_spriteOffset{ 32.0f, 74.0f };
 	bool				m_ImMario{ true }; // Why is THIS in curly braces?
 

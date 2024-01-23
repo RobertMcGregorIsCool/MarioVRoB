@@ -159,12 +159,12 @@ void Game::move()
 		{
 			if (!((playerBot < rectBot && playerBot > rectTop) && (playerLeft > rectLeft && playerRigt < rectRigt)))
 			{
+				m_lastValidPos = m_location;
 				movement.y = -m_moveSpeed;
 			}
 			else
 			{
-				std::cout << "You sonova bitch, you did it!\n";
-				m_location = sf::Vector2f(m_marioSprite.getPosition().x, rectBot - (m_marioSprite.getLocalBounds().height * 0.838f));
+				m_location = m_lastValidPos;
 			}
 		}
 		break;
@@ -173,9 +173,13 @@ void Game::move()
 		{
 			if (!((playerBot < rectBot && playerBot > rectTop) && (playerLeft > rectLeft && playerRigt < rectRigt)))
 			{
+				m_lastValidPos = m_location;
 				movement.y = m_moveSpeed;
 			}
-			
+			else
+			{
+				m_location = m_lastValidPos;
+			}
 		}
 		break;
 	case Direction::Left:
@@ -183,9 +187,13 @@ void Game::move()
 		{
 			if (!((playerBot < rectBot && playerBot > rectTop) && (playerLeft > rectLeft && playerRigt < rectRigt)))
 			{
+				m_lastValidPos = m_location;
 				movement.x = -m_moveSpeed;
 			}
-			
+			else
+			{
+				m_location = m_lastValidPos;
+			}
 		}
 		break;
 	case Direction::Right:
@@ -193,9 +201,13 @@ void Game::move()
 		{
 			if (!((playerBot < rectBot && playerBot > rectTop) && (playerLeft > rectLeft && playerRigt < rectRigt)))
 			{
+				m_lastValidPos = m_location;
 				movement.x = m_moveSpeed;
 			}
-			
+			else
+			{
+				m_location = m_lastValidPos;
+			}
 		}
 		break;
 	default:
