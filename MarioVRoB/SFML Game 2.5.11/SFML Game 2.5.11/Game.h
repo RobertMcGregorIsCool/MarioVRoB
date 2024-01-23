@@ -51,7 +51,7 @@ private:
 
 	void centerText();
 
-	//bool collidingWithBounds();
+	bool collidingWithBounds(float bot, float top, float left, float rigt);
 
 	const float			m_moveSpeed = 1.5f; // Player movement speed - maybe other things too?
 

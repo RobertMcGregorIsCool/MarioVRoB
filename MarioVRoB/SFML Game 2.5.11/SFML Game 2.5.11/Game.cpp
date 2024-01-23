@@ -144,10 +144,7 @@ void Game::move()
 	float playerLeft = m_location.x + (m_marioSprite.getLocalBounds().width * 0.25f);
 	float playerRigt = m_location.x + (m_marioSprite.getLocalBounds().width * 0.75f);
 
-	float rectTop = m_rectangleShape.getGlobalBounds().top;
-	float rectBot = rectTop + m_rectangleShape.getGlobalBounds().height;
-	float rectLeft = m_rectangleShape.getGlobalBounds().left;
-	float rectRigt = rectLeft + m_rectangleShape.getGlobalBounds().width;
+	
 
 
 	switch (m_direction)
@@ -157,7 +154,7 @@ void Game::move()
 	case Direction::Up:
 		if (playerBot > 0.0f)
 		{
-			if (!((playerBot < rectBot && playerBot > rectTop) && (playerLeft > rectLeft && playerRigt < rectRigt)))
+			if (!collidingWithBounds(playerBot, playerTop, playerLeft, playerRigt))
 			{
 				m_lastValidPos = m_location;
 				movement.y = -m_moveSpeed;
@@ -171,7 +168,7 @@ void Game::move()
 	case Direction::Down:
 		if (playerTop < m_window.getSize().y)
 		{
-			if (!((playerBot < rectBot && playerBot > rectTop) && (playerLeft > rectLeft && playerRigt < rectRigt)))
+			if (!collidingWithBounds(playerBot, playerTop, playerLeft, playerRigt))
 			{
 				m_lastValidPos = m_location;
 				movement.y = m_moveSpeed;
@@ -185,7 +182,7 @@ void Game::move()
 	case Direction::Left:
 		if (playerLeft > 0.0f)
 		{
-			if (!((playerBot < rectBot && playerBot > rectTop) && (playerLeft > rectLeft && playerRigt < rectRigt)))
+			if (!collidingWithBounds(playerBot, playerTop, playerLeft, playerRigt))
 			{
 				m_lastValidPos = m_location;
 				movement.x = -m_moveSpeed;
@@ -199,7 +196,7 @@ void Game::move()
 	case Direction::Right:
 		if (playerRigt< m_window.getSize().x)
 		{
-			if (!((playerBot < rectBot && playerBot > rectTop) && (playerLeft > rectLeft && playerRigt < rectRigt)))
+			if (!collidingWithBounds(playerBot, playerTop, playerLeft, playerRigt))
 			{
 				m_lastValidPos = m_location;
 				movement.x = m_moveSpeed;
@@ -337,4 +334,21 @@ void Game::centerText()
 	location.y = 50.0f;
 	location.x = 400 - (m_characterName.getGlobalBounds().width / 2);
 	m_characterName.setPosition(location);
+}
+
+bool Game::collidingWithBounds(float bot, float top, float left, float rigt)
+{
+	float rectTop	= m_rectangleShape.getGlobalBounds().top;
+	float rectBot	= rectTop + m_rectangleShape.getGlobalBounds().height;
+	float rectLeft	= m_rectangleShape.getGlobalBounds().left;
+	float rectRigt	= rectLeft + m_rectangleShape.getGlobalBounds().width;
+
+	if ((bot < rectBot && bot > rectTop) && (left > rectLeft && rigt < rectRigt))
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
