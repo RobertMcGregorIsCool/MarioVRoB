@@ -16,6 +16,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Audio.hpp>
+#include <SFML/Audio/Music.hpp>
 
 enum class Direction
 {
@@ -66,7 +67,10 @@ private:
 	sf::Texture			m_marioTexture;	// texture used for image of mario and luigi
 	sf::Sprite			m_marioSprite;	// sprite used for marioLuigi
 
-	// sf::Vector2f		m_location{ 20.0f, 10.0f }; // Mario's position. I dig how explicit the Vector types are.
+	sf::Texture			m_setuTexture; // Texture of SETUMonster
+	sf::Sprite			m_setuSprite;	// Sprite for SETUMonster
+	sf::Vector2f		m_setuPosition{ 20.0f, 10.0f }; // Position of SETUMonster
+
 	sf::Vector2f		m_location{ 20.0f, 550.0f }; // Mario's position. I dig how explicit the Vector types are.
 	sf::Vector2f		m_lastValidPos{ 0.0f, 0.0f }; // Last valid position while not touching collider.
 	sf::Vector2f		m_spriteOffset{ 32.0f, 74.0f };
@@ -79,10 +83,12 @@ private:
 	sf::SoundBuffer		m_snd_exclaimLuigi;
 	sf::Sound			m_soundSource_charName;
 
+	sf::Music			m_music_angelAttack;
+
 	sf::RectangleShape	m_rectangleShape;
 	sf::RectangleShape	m_rectDebug;
 
-	sf::Color			m_clearColor{ 255,255,255,128 };
+	sf::Color			m_clearColor{ 255,0,0,2 };
 };
 
 #endif // !GAME_HPP

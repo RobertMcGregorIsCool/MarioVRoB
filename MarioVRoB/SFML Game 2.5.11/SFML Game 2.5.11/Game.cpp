@@ -128,11 +128,14 @@ void Game::render()
 	//m_window.draw(m_welcomeMessage); // Get rid of this before Pete sees it!
 
 	m_window.draw(m_characterName);
+	
 	// m_window.draw(m_logoSprite);
 
 	m_window.draw(m_rectangleShape);
 
 	m_window.draw(m_marioSprite);
+
+	m_window.draw(m_setuSprite);
 
 	m_window.draw(m_rectDebug); // Turn this off when I've found the right values.
 
@@ -270,16 +273,25 @@ void Game::setupSprite()
 		std::cout << "problem loading italian plumbers" << std::endl;
 	}
 
+	if (!m_setuTexture.loadFromFile("ASSETS\\IMAGES\\ROB\\SETU_logo_monster01001RS.png"))
+	{// Simple error message if loading SETU Monster fails.
+		std::cout << "Problem loading the SETU Monster." << std::endl;
+	}
+
 	m_marioSprite.setTexture(m_marioTexture);
 	m_marioSprite.setPosition(m_location);
 	m_marioSprite.setTextureRect(sf::IntRect(0, 0, 64, 148));
+
+	m_setuSprite.setTexture(m_setuTexture);
+	m_setuSprite.setPosition(300.0f, 180.0f); // instead, should be using m_setuposition
 
 	m_logoSprite.setTexture(m_logoTexture);
 	m_logoSprite.setPosition(300.0f, 180.0f); // So I need to change this stuff so the text follows the character around.
 
 	m_rectangleShape.setSize(sf::Vector2f(256.0f, 256.0f));
 	m_rectangleShape.setPosition((m_window.getSize().x * 0.5f) - m_rectangleShape.getSize().x * 0.5f, (m_window.getSize().y * 0.5f) - m_rectangleShape.getSize().y * 0.5f);
-	m_rectangleShape.setFillColor(sf::Color::Cyan);
+	// m_rectangleShape.setFillColor(sf::Color::Cyan);
+	m_rectangleShape.setFillColor(m_clearColor);
 
 	m_rectDebug.setSize(sf::Vector2f(256.0f, 4.0f));
 	m_rectDebug.setPosition((m_window.getSize().x * 0.5f) - m_rectDebug.getSize().x * 0.5f, m_rectangleShape.getGlobalBounds().top + m_rectangleShape.getGlobalBounds().height);
@@ -297,6 +309,13 @@ void Game::setupSounds()
 	{// Simple error message if load fails.
 		std::cout << "Failed to load 'luigi.wav'\n";
 	}
+
+	if (!m_music_angelAttack.openFromFile("ASSETS\\SOUNDS\\03 - ANGEL ATTACK.flac"))
+	{// Simple error message if load fails.
+		std::cout << "Failed to load 'angel attack' bgm\n";
+	}
+
+	m_music_angelAttack.play();
 
 	m_soundSource_charName.setBuffer(m_snd_exclaimMario);
 }
