@@ -14,6 +14,7 @@
 /// Don't forget the endif at the bottom
 /// </summary>
 #include <SFML/Graphics.hpp>
+#include <SFML/Graphics/Color.hpp>
 #include <SFML/Audio.hpp>
 
 enum class Direction
@@ -80,6 +81,8 @@ private:
 
 	sf::RectangleShape	m_rectangleShape;
 	sf::RectangleShape	m_rectDebug;
+
+	sf::Color			m_clearColor{ 255,255,255,128 };
 };
 
 #endif // !GAME_HPP

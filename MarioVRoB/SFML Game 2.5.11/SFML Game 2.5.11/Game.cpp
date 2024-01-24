@@ -119,10 +119,13 @@ void Game::update(sf::Time t_deltaTime)
 /// </summary>
 void Game::render()
 {
-	m_window.clear(sf::Color::White);
-	//m_window.draw(m_welcomeMessage); // Get rid of this before Pete sees it!
-
+	if (m_ImMario)
+	{// Basics of Ikaruga effect.
+		m_window.clear(sf::Color::White);
+	}
 	
+	// m_window.clear(m_clearColor); // I think I need to use a background sprite instead, for the effect I want.
+	//m_window.draw(m_welcomeMessage); // Get rid of this before Pete sees it!
 
 	m_window.draw(m_characterName);
 	// m_window.draw(m_logoSprite);
@@ -143,9 +146,6 @@ void Game::move()
 	float playerTop = m_location.y + (m_marioSprite.getLocalBounds().height * 0.4f);
 	float playerLeft = m_location.x + (m_marioSprite.getLocalBounds().width * 0.25f);
 	float playerRigt = m_location.x + (m_marioSprite.getLocalBounds().width * 0.75f);
-
-	
-
 
 	switch (m_direction)
 	{
@@ -217,19 +217,19 @@ void Game::move()
 void Game::checkDirection()
 {
 	m_direction = Direction::None;
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || sf::Keyboard::isKeyPressed(sf::Keyboard::W))
 	{
 		m_direction = Direction::Up;
 	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) || sf::Keyboard::isKeyPressed(sf::Keyboard::S))
 	{
 		m_direction = Direction::Down;
 	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) || sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 	{
 		m_direction = Direction::Left;
 	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) || sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 	{
 		m_direction = Direction::Right;
 	}
@@ -343,7 +343,7 @@ bool Game::collidingWithBounds(float bot, float top, float left, float rigt)
 	float rectLeft	= m_rectangleShape.getGlobalBounds().left;
 	float rectRigt	= rectLeft + m_rectangleShape.getGlobalBounds().width;
 
-	if ((bot < rectBot && bot > rectTop) && (left > rectLeft && rigt < rectRigt))
+	if ((bot < rectBot && bot > rectTop) && (left < rectRigt && rigt > rectLeft))
 	{
 		return true;
 	}
