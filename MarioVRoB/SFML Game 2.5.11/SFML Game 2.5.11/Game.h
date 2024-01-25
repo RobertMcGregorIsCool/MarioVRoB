@@ -17,6 +17,9 @@
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Audio.hpp>
 #include <SFML/Audio/Music.hpp>
+#include <array>
+#include <iostream>
+#include <cmath>
 
 enum class Direction
 {
@@ -44,6 +47,9 @@ private:
 	void update(sf::Time t_deltaTime);
 	void render();
 	void move();
+	void setuMovement();
+
+	sf::Vector2f normalizeV2f(const sf::Vector2f source);
 
 	void checkDirection();
 	void setupFontAndText();
@@ -67,9 +73,18 @@ private:
 	sf::Texture			m_marioTexture;	// texture used for image of mario and luigi
 	sf::Sprite			m_marioSprite;	// sprite used for marioLuigi
 
+	// TopLeft 80.0f, 40.0f, TopRigt 600.0f, 40.0f, BotLef 80.0f, 440.0f, BotRit 600.0f, 440.0f
+	std::array<sf::Vector2f, 4> m_setuWaypoints = { sf::Vector2f(80.0f, 40.0f), sf::Vector2f(600.0f, 40.0f), sf::Vector2f(600.0f, 440.0f), sf::Vector2f(80.0f, 440.0f) };
 	sf::Texture			m_setuTexture; // Texture of SETUMonster
 	sf::Sprite			m_setuSprite;	// Sprite for SETUMonster
-	sf::Vector2f		m_setuPosition{ 20.0f, 10.0f }; // Position of SETUMonster
+	sf::Vector2f		m_setuPosition = m_setuWaypoints[3]; // Position of SETUMonster
+	int					m_setuPosIndex	= 3;
+	sf::Vector2f		m_setuDirection{ 0.0f, 0.0f };
+
+	sf::Texture			m_eBallTexture; // Texture of energyball.
+	sf::Sprite			m_eBallSprite; // Sprite which displays the energyball
+	sf::Vector2f		m_eBallPosition{ 640.0f, 520.0f }; // Position of energyBall;
+	
 
 	sf::Vector2f		m_location{ 20.0f, 550.0f }; // Mario's position. I dig how explicit the Vector types are.
 	sf::Vector2f		m_lastValidPos{ 0.0f, 0.0f }; // Last valid position while not touching collider.

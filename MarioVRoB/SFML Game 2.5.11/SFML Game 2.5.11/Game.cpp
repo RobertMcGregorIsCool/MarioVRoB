@@ -8,9 +8,6 @@
 /// </summary>
 
 #include "Game.h"
-#include <iostream>
-
-
 
 /// <summary>
 /// default constructor
@@ -112,6 +109,7 @@ void Game::update(sf::Time t_deltaTime)
 	}
 	checkDirection();
 	move();
+	setuMovement();
 }
 
 /// <summary>
@@ -136,6 +134,8 @@ void Game::render()
 	m_window.draw(m_marioSprite);
 
 	m_window.draw(m_setuSprite);
+
+	m_window.draw(m_eBallSprite);
 
 	m_window.draw(m_rectDebug); // Turn this off when I've found the right values.
 
@@ -217,6 +217,28 @@ void Game::move()
 	m_marioSprite.setPosition(m_location);
 }
 
+void Game::setuMovement()
+{
+	m_setuDirection = { 0.0f, 0.0f };
+	m_setuDirection = m_setuWaypoints[m_setuPosIndex] - m_setuSprite.getPosition();
+	m_setuDirection = normalizeV2f(m_setuDirection);
+	m_setuPosition = m_setuSprite.getPosition() + m_setuDirection;
+	m_setuSprite.setPosition(m_setuPosition);
+
+	sf::Vector2f dist = m_setuWaypoints[m_setuPosIndex] - m_setuSprite.getPosition();
+
+	std::cout << dist.x + dist.y;
+}
+
+sf::Vector2f Game::normalizeV2f(const sf::Vector2f source)
+{
+	float length = sqrt((source.x * source.x) + (source.y * source.y));
+	if (length != 0)
+		return sf::Vector2f(source.x / length, source.y / length);
+	else
+		return source;
+}
+
 void Game::checkDirection()
 {
 	m_direction = Direction::None;
@@ -278,20 +300,28 @@ void Game::setupSprite()
 		std::cout << "Problem loading the SETU Monster." << std::endl;
 	}
 
+	if (!m_eBallTexture.loadFromFile("ASSETS\\IMAGES\\ROB\\SETU_EnergyBall01001RS.png"))
+	{// Simple error message if loading Energy Ball fails.
+		std::cout << "Problem loading the EnergyBall texture";
+	}
+
 	m_marioSprite.setTexture(m_marioTexture);
 	m_marioSprite.setPosition(m_location);
 	m_marioSprite.setTextureRect(sf::IntRect(0, 0, 64, 148));
 
 	m_setuSprite.setTexture(m_setuTexture);
-	m_setuSprite.setPosition(300.0f, 180.0f); // instead, should be using m_setuposition
+	m_setuSprite.setPosition(m_setuWaypoints[2]); // instead, should be using m_setuposition
+
+	m_eBallSprite.setTexture(m_eBallTexture);
+	m_eBallSprite.setPosition(m_eBallPosition);
 
 	m_logoSprite.setTexture(m_logoTexture);
 	m_logoSprite.setPosition(300.0f, 180.0f); // So I need to change this stuff so the text follows the character around.
 
 	m_rectangleShape.setSize(sf::Vector2f(256.0f, 256.0f));
 	m_rectangleShape.setPosition((m_window.getSize().x * 0.5f) - m_rectangleShape.getSize().x * 0.5f, (m_window.getSize().y * 0.5f) - m_rectangleShape.getSize().y * 0.5f);
-	// m_rectangleShape.setFillColor(sf::Color::Cyan);
-	m_rectangleShape.setFillColor(m_clearColor);
+	m_rectangleShape.setFillColor(sf::Color::Cyan);
+	//m_rectangleShape.setFillColor(m_clearColor);
 
 	m_rectDebug.setSize(sf::Vector2f(256.0f, 4.0f));
 	m_rectDebug.setPosition((m_window.getSize().x * 0.5f) - m_rectDebug.getSize().x * 0.5f, m_rectangleShape.getGlobalBounds().top + m_rectangleShape.getGlobalBounds().height);
@@ -314,7 +344,7 @@ void Game::setupSounds()
 	{// Simple error message if load fails.
 		std::cout << "Failed to load 'angel attack' bgm\n";
 	}
-
+	m_music_angelAttack.setLoop(true);
 	m_music_angelAttack.play();
 
 	m_soundSource_charName.setBuffer(m_snd_exclaimMario);
