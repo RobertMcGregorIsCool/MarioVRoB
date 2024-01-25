@@ -110,6 +110,7 @@ void Game::update(sf::Time t_deltaTime)
 	checkDirection();
 	move();
 	setuMovement();
+	eBallMovement();
 }
 
 /// <summary>
@@ -145,10 +146,10 @@ void Game::render()
 void Game::move()
 {
 	sf::Vector2f movement{ 0.0f, 0.0f };
-	float playerBot = m_location.y + (m_marioSprite.getLocalBounds().height * 0.85f);
-	float playerTop = m_location.y + (m_marioSprite.getLocalBounds().height * 0.4f);
-	float playerLeft = m_location.x + (m_marioSprite.getLocalBounds().width * 0.25f);
-	float playerRigt = m_location.x + (m_marioSprite.getLocalBounds().width * 0.75f);
+	float playerBot = m_location.y + (m_marioSprite.getLocalBounds().height * 0.35f); //0.85
+	float playerTop = m_location.y + (m_marioSprite.getLocalBounds().height * 0.4f);  //0.4
+	float playerLeft = m_location.x - (m_marioSprite.getLocalBounds().width * 0.75f);
+	float playerRigt = m_location.x - (m_marioSprite.getLocalBounds().width * 0.25f);
 
 	switch (m_direction)
 	{
@@ -219,24 +220,63 @@ void Game::move()
 
 void Game::setuMovement()
 {
-	m_setuDirection = { 0.0f, 0.0f };
+	m_setuDirection = { 0.0f, 0.0f }; // This shouldn't be required?
 	m_setuDirection = m_setuWaypoints[m_setuPosIndex] - m_setuSprite.getPosition();
 	m_setuDirection = normalizeV2f(m_setuDirection);
 	m_setuPosition = m_setuSprite.getPosition() + m_setuDirection;
 	m_setuSprite.setPosition(m_setuPosition);
 
-	sf::Vector2f dist = m_setuWaypoints[m_setuPosIndex] - m_setuSprite.getPosition();
-
-	std::cout << dist.x + dist.y;
+	if (vector2fSqrMag(m_setuWaypoints[m_setuPosIndex], m_setuSprite.getPosition()) < m_setuWaypointThreshold)
+	{
+		if (m_setuPosIndex == m_setuWaypoints.size() -1)
+		{
+			m_setuPosIndex = 0;
+		}
+		else
+		{
+			m_setuPosIndex++;
+		}
+	}
 }
 
-sf::Vector2f Game::normalizeV2f(const sf::Vector2f source)
+void Game::eBallMovement()
 {
+	if (!m_eBallTravelling || vector2fSqrMag(m_setuSprite.getPosition(), m_eBallSprite.getPosition(), true) > m_eBallResetDist)//distance is too great
+	{
+		m_eBallTravelling = true;
+		m_eBallSprite.setPosition(m_setuSprite.getPosition()); // Reset on top of SETU Monster
+		m_eBallDirection = m_marioSprite.getPosition() - m_eBallSprite.getPosition();
+		m_eBallDirection = normalizeV2f(m_eBallDirection);
+		m_eBallDirection *= m_eBallMoveSpeed;
+	}
+	else
+	{
+		m_eBallPosition = m_eBallSprite.getPosition() + m_eBallDirection;
+		m_eBallSprite.setPosition(m_eBallPosition);
+	}
+}
+
+sf::Vector2f Game::normalizeV2f(const sf::Vector2f source) // NOT MY CODE. https://en.sfml-dev.org/forums/index.php?topic=1488.0 (bottom of page)
+{// However, SFML 3 apparently will have a built-in utillity function for normalising vectors, so...!
 	float length = sqrt((source.x * source.x) + (source.y * source.y));
 	if (length != 0)
 		return sf::Vector2f(source.x / length, source.y / length);
 	else
 		return source;
+}
+
+float Game::vector2fSqrMag(const sf::Vector2f posA, const sf::Vector2f posB, const bool printDist)
+{
+	sf::Vector2f dist = posA - posB;
+
+	float sqrMag = (dist.x * dist.x) + (dist.y * dist.y);
+
+	if (printDist)
+	{
+		std::cout << "Distance is " << sqrMag << ".\n\n";
+	}
+
+	return sqrMag;
 }
 
 void Game::checkDirection()
@@ -308,11 +348,14 @@ void Game::setupSprite()
 	m_marioSprite.setTexture(m_marioTexture);
 	m_marioSprite.setPosition(m_location);
 	m_marioSprite.setTextureRect(sf::IntRect(0, 0, 64, 148));
+	m_marioSprite.setOrigin(64.0f, 74.0f);// (64.0f, 74.0f);
 
 	m_setuSprite.setTexture(m_setuTexture);
+	m_setuSprite.setOrigin(64.0f, 64.0f);
 	m_setuSprite.setPosition(m_setuWaypoints[2]); // instead, should be using m_setuposition
 
 	m_eBallSprite.setTexture(m_eBallTexture);
+	m_eBallSprite.setOrigin(16.0f, 16.0f);
 	m_eBallSprite.setPosition(m_eBallPosition);
 
 	m_logoSprite.setTexture(m_logoTexture);

@@ -48,8 +48,11 @@ private:
 	void render();
 	void move();
 	void setuMovement();
+	void eBallMovement();
 
 	sf::Vector2f normalizeV2f(const sf::Vector2f source);
+	// float vector2fSqrMag(const sf::Vector2f posA, const sf::Vector2f posB, const bool printDist = false); Delete if the line below works.
+	float vector2fSqrMag(const sf::Vector2f posA, const sf::Vector2f posB, const bool printDist = false);
 
 	void checkDirection();
 	void setupFontAndText();
@@ -61,7 +64,7 @@ private:
 
 	bool collidingWithBounds(float bot, float top, float left, float rigt);
 
-	const float			m_moveSpeed = 1.5f; // Player movement speed - maybe other things too?
+	const float			m_moveSpeed = 4.5f; // Player movement speed - maybe other things too? 1.5f
 
 	sf::RenderWindow	m_window; // main SFML window
 	sf::Font			m_mariofont; // font used by message
@@ -73,17 +76,22 @@ private:
 	sf::Texture			m_marioTexture;	// texture used for image of mario and luigi
 	sf::Sprite			m_marioSprite;	// sprite used for marioLuigi
 
-	// TopLeft 80.0f, 40.0f, TopRigt 600.0f, 40.0f, BotLef 80.0f, 440.0f, BotRit 600.0f, 440.0f
-	std::array<sf::Vector2f, 4> m_setuWaypoints = { sf::Vector2f(80.0f, 40.0f), sf::Vector2f(600.0f, 40.0f), sf::Vector2f(600.0f, 440.0f), sf::Vector2f(80.0f, 440.0f) };
+	// TopLeft 80.0f, 10.0f, TopRigt 600.0f, 10.0f, BotLef 80.0f, 440.0f, BotRit 600.0f, 440.0f
+	std::array<sf::Vector2f, 4> m_setuWaypoints = { sf::Vector2f(144.0f, 74.0f), sf::Vector2f(664.0f, 74.0f), sf::Vector2f(664.0f, 504.0f), sf::Vector2f(144.0f, 504.0f) };
+	const float			m_setuWaypointThreshold = 8.0f;
 	sf::Texture			m_setuTexture; // Texture of SETUMonster
 	sf::Sprite			m_setuSprite;	// Sprite for SETUMonster
 	sf::Vector2f		m_setuPosition = m_setuWaypoints[3]; // Position of SETUMonster
 	int					m_setuPosIndex	= 3;
 	sf::Vector2f		m_setuDirection{ 0.0f, 0.0f };
 
+	bool				m_eBallTravelling = false;
+	const float			m_eBallResetDist = 250000.0f;
+	const float			m_eBallMoveSpeed = 4.0f;
 	sf::Texture			m_eBallTexture; // Texture of energyball.
 	sf::Sprite			m_eBallSprite; // Sprite which displays the energyball
-	sf::Vector2f		m_eBallPosition{ 640.0f, 520.0f }; // Position of energyBall;
+	sf::Vector2f		m_eBallPosition{ 656.0f, 500.0f }; // Position of energyBall;
+	sf::Vector2f		m_eBallDirection{ 0.0f, 0.0f };
 	
 
 	sf::Vector2f		m_location{ 20.0f, 550.0f }; // Mario's position. I dig how explicit the Vector types are.
