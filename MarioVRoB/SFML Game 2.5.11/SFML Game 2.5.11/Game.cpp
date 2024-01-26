@@ -121,16 +121,19 @@ void Game::render()
 	if (m_ImMario)
 	{// Basics of Ikaruga effect.
 		m_window.clear(sf::Color::White);
+		m_window.draw(m_playfieldSprite);
 	}
 	
 	// m_window.clear(m_clearColor); // I think I need to use a background sprite instead, for the effect I want.
 	//m_window.draw(m_welcomeMessage); // Get rid of this before Pete sees it!
 
+	
+
 	m_window.draw(m_characterName);
 	
 	// m_window.draw(m_logoSprite);
 
-	m_window.draw(m_rectangleShape);
+	// m_window.draw(m_rectangleShape); // This exists for number reference, but is not drawn.
 
 	m_window.draw(m_marioSprite);
 
@@ -138,7 +141,7 @@ void Game::render()
 
 	m_window.draw(m_eBallSprite);
 
-	m_window.draw(m_rectDebug); // Turn this off when I've found the right values.
+	//m_window.draw(m_rectDebug); // Turn this off when I've found the right values.
 
 	m_window.display();
 }
@@ -241,7 +244,7 @@ void Game::setuMovement()
 
 void Game::eBallMovement()
 {
-	if (!m_eBallTravelling || vector2fSqrMag(m_setuSprite.getPosition(), m_eBallSprite.getPosition(), true) > m_eBallResetDist)//distance is too great
+	if (!m_eBallTravelling || vector2fSqrMag(m_setuSprite.getPosition(), m_eBallSprite.getPosition()) > m_eBallResetDist)//distance is too great
 	{
 		m_eBallTravelling = true;
 		m_eBallSprite.setPosition(m_setuSprite.getPosition()); // Reset on top of SETU Monster
@@ -345,6 +348,13 @@ void Game::setupSprite()
 		std::cout << "Problem loading the EnergyBall texture";
 	}
 
+	if (!m_playfieldTexture.loadFromFile("ASSETS\\IMAGES\\ROB\\playfield01001RS.png"))
+	{// Simple error message if loading playfield fails
+		std::cout << "Problem loading the playfield texture\n";
+	}
+
+	m_playfieldSprite.setTexture(m_playfieldTexture);
+
 	m_marioSprite.setTexture(m_marioTexture);
 	m_marioSprite.setPosition(m_location);
 	m_marioSprite.setTextureRect(sf::IntRect(0, 0, 64, 148));
@@ -363,8 +373,8 @@ void Game::setupSprite()
 
 	m_rectangleShape.setSize(sf::Vector2f(256.0f, 256.0f));
 	m_rectangleShape.setPosition((m_window.getSize().x * 0.5f) - m_rectangleShape.getSize().x * 0.5f, (m_window.getSize().y * 0.5f) - m_rectangleShape.getSize().y * 0.5f);
-	m_rectangleShape.setFillColor(sf::Color::Cyan);
-	//m_rectangleShape.setFillColor(m_clearColor);
+	// m_rectangleShape.setFillColor(sf::Color::Cyan);
+	m_rectangleShape.setFillColor(m_clearColor);
 
 	m_rectDebug.setSize(sf::Vector2f(256.0f, 4.0f));
 	m_rectDebug.setPosition((m_window.getSize().x * 0.5f) - m_rectDebug.getSize().x * 0.5f, m_rectangleShape.getGlobalBounds().top + m_rectangleShape.getGlobalBounds().height);

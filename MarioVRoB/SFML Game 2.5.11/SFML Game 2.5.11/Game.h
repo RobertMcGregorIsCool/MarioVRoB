@@ -64,14 +64,16 @@ private:
 
 	bool collidingWithBounds(float bot, float top, float left, float rigt);
 
-	const float			m_moveSpeed = 4.5f; // Player movement speed - maybe other things too? 1.5f
+	const float			m_moveSpeed = 1.5f; // Player movement speed - maybe other things too? 1.5f
 
 	sf::RenderWindow	m_window; // main SFML window
 	sf::Font			m_mariofont; // font used by message
 	sf::Text			m_characterName; // ROB: Hmm. Change from Pete's first version (ie. Github) here?
 	sf::Text			m_welcomeMessage; // text used for message on screen
 	sf::Texture			m_logoTexture; // texture used for sfml logo
+	sf::Texture			m_playfieldTexture; // texture used for playfield
 	sf::Sprite			m_logoSprite; // sprite used for sfml logo
+	sf::Sprite			m_playfieldSprite; // sprite used for playfield
 
 	sf::Texture			m_marioTexture;	// texture used for image of mario and luigi
 	sf::Sprite			m_marioSprite;	// sprite used for marioLuigi
