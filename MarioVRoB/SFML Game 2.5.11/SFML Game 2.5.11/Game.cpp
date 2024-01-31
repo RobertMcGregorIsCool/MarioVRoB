@@ -92,7 +92,7 @@ void Game::processKeys(sf::Event t_event)
 		m_exitGame = true;
 	}
 	if (sf::Keyboard::Space == t_event.key.code)
-	{
+	{ // I've changed a lot here, but am retaining Pete's original naming where possible. Hope that's the right approach!
 		changeCharacter();
 	}
 }
@@ -109,8 +109,8 @@ void Game::update(sf::Time t_deltaTime)
 	}
 	checkDirection();
 	move();
-	setuMovement();
-	eBallMovement();
+	setuMovement(); // Monster patrols waypoints around campus
+	eBallMovement();// Energy ball fires at player character and teleports back to monster
 }
 
 /// <summary>
@@ -123,17 +123,13 @@ void Game::render()
 		m_window.clear(sf::Color::White);
 		m_window.draw(m_playfieldSprite);
 	}
-	
-	// m_window.clear(m_clearColor); // I think I need to use a background sprite instead, for the effect I want.
-	//m_window.draw(m_welcomeMessage); // Get rid of this before Pete sees it!
 
-	
-
-	m_window.draw(m_characterName);
-	
+	//m_window.draw(m_welcomeMessage);	// Used comments to get rid of this. I WOULD use 'Debug', but this project is all Debug atm.
 	// m_window.draw(m_logoSprite);
 
 	// m_window.draw(m_rectangleShape); // This exists for number reference, but is not drawn.
+
+	m_window.draw(m_characterName);		// Probably replacing this with a status indicator for player char.
 
 	m_window.draw(m_marioSprite);
 
@@ -313,7 +309,7 @@ void Game::setupFontAndText()
 		std::cout << "problem loading SuperMario256 font" << std::endl;
 	}
 	m_characterName.setFont(m_mariofont);
-	m_characterName.setString("Mario");
+	m_characterName.setString("Active");
 	m_characterName.setStyle(sf::Text::Underlined | sf::Text::Italic | sf::Text::Bold);
 	m_characterName.setPosition(40.0f, 40.0f);
 	m_characterName.setCharacterSize(80U);
@@ -333,9 +329,9 @@ void Game::setupSprite()
 		std::cout << "problem loading logo" << std::endl;
 	}
 
-	if (!m_marioTexture.loadFromFile("ASSETS\\IMAGES\\mario-luigi-64.png"))
+	if (!m_marioTexture.loadFromFile("ASSETS\\IMAGES\\ROB\\sculpture01001RS.png")) // mario-luigi-64
 	{// Simple error message if previous call fails
-		std::cout << "problem loading italian plumbers" << std::endl;
+		std::cout << "problem loading college sculpture" << std::endl;
 	}
 
 	if (!m_setuTexture.loadFromFile("ASSETS\\IMAGES\\ROB\\SETU_logo_monster01001RS.png"))
@@ -369,12 +365,11 @@ void Game::setupSprite()
 	m_eBallSprite.setPosition(m_eBallPosition);
 
 	m_logoSprite.setTexture(m_logoTexture);
-	m_logoSprite.setPosition(300.0f, 180.0f); // So I need to change this stuff so the text follows the character around.
+	m_logoSprite.setPosition(300.0f, 180.0f);		// So I need to change this stuff so the text follows the character around.
 
 	m_rectangleShape.setSize(sf::Vector2f(256.0f, 256.0f));
 	m_rectangleShape.setPosition((m_window.getSize().x * 0.5f) - m_rectangleShape.getSize().x * 0.5f, (m_window.getSize().y * 0.5f) - m_rectangleShape.getSize().y * 0.5f);
-	// m_rectangleShape.setFillColor(sf::Color::Cyan);
-	m_rectangleShape.setFillColor(m_clearColor);
+	m_rectangleShape.setFillColor(m_clearColor);	// Previously used sf::Color::Cyan . Currently using bounds of shape for collision.
 
 	m_rectDebug.setSize(sf::Vector2f(256.0f, 4.0f));
 	m_rectDebug.setPosition((m_window.getSize().x * 0.5f) - m_rectDebug.getSize().x * 0.5f, m_rectangleShape.getGlobalBounds().top + m_rectangleShape.getGlobalBounds().height);
@@ -404,11 +399,11 @@ void Game::setupSounds()
 }
 
 void Game::changeCharacter()
-{
+{// Originally this changed Mario to Luigi and vice versa. Now it powers an Ikaruga-style mechanic.
 	m_ImMario = !m_ImMario; // Toggle whether you are or are not Mario.
 	if (m_ImMario)
 	{
-		m_characterName.setString("Mario");
+		m_characterName.setString("Active");
 		m_characterName.setFillColor(sf::Color::Red);
 		m_characterName.setOutlineColor(sf::Color::Green);
 		m_marioSprite.setTextureRect(sf::IntRect{ 0,0,64,148 }); // Mario is to left of 128 width texture, so rect starts at x0.
@@ -419,7 +414,7 @@ void Game::changeCharacter()
 	}
 	else
 	{
-		m_characterName.setString("Luigi");
+		m_characterName.setString("Ghost");
 		m_characterName.setFillColor(sf::Color::Green);
 		m_characterName.setOutlineColor(sf::Color::Red);
 		m_marioSprite.setTextureRect(sf::IntRect{ 64,0,64,148 });// Luigi is to right of 128 width texture, so rect starts at x64 (hor middle).
