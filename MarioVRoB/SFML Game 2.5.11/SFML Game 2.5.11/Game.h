@@ -87,7 +87,7 @@ private:
 	sf::Vector2f		m_setuDirection{ 0.0f, 0.0f };
 
 	bool				m_eBallTravelling = false;
-	const float			m_eBallResetDist = 300000.0f;		// At this distance from SETU Monster, ball teleports to SETU Monster
+	const float			m_eBallResetDist = 500000.0f;		// At this distance from SETU Monster, ball teleports to SETU Monster
 	const float			m_eBallMoveSpeed = 8.0f;
 	sf::Texture			m_eBallTexture;						// Texture of energyball.
 	sf::Sprite			m_eBallSprite;						// Sprite which displays the energyball
@@ -95,7 +95,7 @@ private:
 	sf::Vector2f		m_eBallDirection{ 0.0f, 0.0f };
 	
 
-	sf::Vector2f		m_location{ 20.0f, 550.0f };		// Mario's position. I dig how explicit the Vector types are.
+	sf::Vector2f		m_location{ 120.0f, 500.0f };		// Mario's position. I dig how explicit the Vector types are.
 	sf::Vector2f		m_lastValidPos{ 0.0f, 0.0f };		// Last valid position while not touching collider.
 	sf::Vector2f		m_spriteOffset{ 32.0f, 74.0f };
 	bool				m_ImMario{ true };					// Why is THIS in curly braces?
