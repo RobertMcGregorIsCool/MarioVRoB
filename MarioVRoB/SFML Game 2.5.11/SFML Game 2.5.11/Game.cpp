@@ -50,6 +50,7 @@ void Game::run()
 	{
 		processEvents(); // as many as possible
 		timeSinceLastUpdate += clock.restart();
+		
 		while (timeSinceLastUpdate > timePerFrame)
 		{
 			timeSinceLastUpdate -= timePerFrame;
@@ -91,9 +92,14 @@ void Game::processKeys(sf::Event t_event)
 	{
 		m_exitGame = true;
 	}
+
 	if (sf::Keyboard::Space == t_event.key.code)
 	{ // I've changed a lot here, but am retaining Pete's original naming where possible. Hope that's the right approach!
 		changeCharacter();
+	}
+	if (sf::Keyboard::Enter == t_event.key.code)
+	{// Test code to reset the game.
+		reset();
 	}
 }
 
@@ -111,6 +117,9 @@ void Game::update(sf::Time t_deltaTime)
 	move();
 	setuMovement(); // Monster patrols waypoints around campus
 	eBallMovement();// Energy ball fires at player character and teleports back to monster
+	eBallCollision();
+	setuCollision();
+	safeCollision();
 }
 
 /// <summary>
@@ -145,10 +154,10 @@ void Game::render()
 void Game::move()
 {
 	sf::Vector2f movement{ 0.0f, 0.0f };
-	float playerBot = m_location.y + (m_marioSprite.getLocalBounds().height * 0.35f); //0.85
-	float playerTop = m_location.y + (m_marioSprite.getLocalBounds().height * 0.4f);  //0.4
-	float playerLeft = m_location.x - (m_marioSprite.getLocalBounds().width * 0.75f);
-	float playerRigt = m_location.x - (m_marioSprite.getLocalBounds().width * 0.25f);
+	float playerBot		= m_location.y + (m_marioSprite.getLocalBounds().height * 0.35f); //0.85
+	float playerTop		= m_location.y + (m_marioSprite.getLocalBounds().height * 0.4f);  //0.4
+	float playerLeft	= m_location.x - (m_marioSprite.getLocalBounds().width * 0.75f);
+	float playerRigt	= m_location.x - (m_marioSprite.getLocalBounds().width * 0.25f);
 
 	switch (m_direction)
 	{
@@ -213,8 +222,12 @@ void Game::move()
 	default:
 		break;
 	}
-	m_location += movement;
-	m_marioSprite.setPosition(m_location);
+
+	if (m_ImMario)
+	{
+		m_location += movement;
+		m_marioSprite.setPosition(m_location);
+	}
 }
 
 void Game::setuMovement()
@@ -222,10 +235,10 @@ void Game::setuMovement()
 	m_setuDirection = { 0.0f, 0.0f }; // This shouldn't be required?
 	m_setuDirection = m_setuWaypoints[m_setuPosIndex] - m_setuSprite.getPosition();
 	m_setuDirection = normalizeV2f(m_setuDirection);
-	m_setuPosition = m_setuSprite.getPosition() + m_setuDirection;
+	m_setuPosition = m_setuSprite.getPosition() + m_setuDirection * M_SETU_MOVE_SPEED;
 	m_setuSprite.setPosition(m_setuPosition);
 
-	if (vector2fSqrMag(m_setuWaypoints[m_setuPosIndex], m_setuSprite.getPosition()) < m_setuWaypointThreshold)
+	if (vector2fSqrMag(m_setuWaypoints[m_setuPosIndex], m_setuSprite.getPosition()) < M_SETU_WAYPOINT_THRESHOLD)
 	{
 		if (m_setuPosIndex == m_setuWaypoints.size() -1)
 		{
@@ -240,18 +253,43 @@ void Game::setuMovement()
 
 void Game::eBallMovement()
 {
-	if (!m_eBallTravelling || vector2fSqrMag(m_setuSprite.getPosition(), m_eBallSprite.getPosition()) > m_eBallResetDist)//distance is too great
+	if (!m_eBallTravelling || vector2fSqrMag(m_setuSprite.getPosition(), m_eBallSprite.getPosition()) > M_E_BALL_RESET_DIST)//distance is too great
 	{
 		m_eBallTravelling = true;
 		m_eBallSprite.setPosition(m_setuSprite.getPosition()); // Reset on top of SETU Monster
 		m_eBallDirection = m_marioSprite.getPosition() - m_eBallSprite.getPosition();
 		m_eBallDirection = normalizeV2f(m_eBallDirection);
-		m_eBallDirection *= m_eBallMoveSpeed;
+		m_eBallDirection *= M_E_BALL_MOVE_SPEED;
+		m_eBallFiringSoundSource.play();
 	}
 	else
 	{
 		m_eBallPosition = m_eBallSprite.getPosition() + m_eBallDirection;
 		m_eBallSprite.setPosition(m_eBallPosition);
+	}
+}
+
+void Game::eBallCollision()
+{
+	if (vector2fSqrMag(m_marioSprite.getPosition(), m_eBallSprite.getPosition()) < M_E_BALL_HIT_THRESH)
+	{
+		if(m_ImMario)reset();
+	}
+}
+
+void Game::setuCollision()
+{
+	if (vector2fSqrMag(m_marioSprite.getPosition(), m_setuSprite.getPosition()) < M_SETU_HIT_THRESH)
+	{
+		reset();
+	}
+}
+
+void Game::safeCollision()
+{
+	if (vector2fSqrMag(m_marioSprite.getPosition(), sf::Vector2f(800.0f, 600.0f)) < M_SETU_HIT_THRESH)
+	{
+		m_exitGame = true;
 	}
 }
 
@@ -309,7 +347,7 @@ void Game::setupFontAndText()
 		std::cout << "problem loading SuperMario256 font" << std::endl;
 	}
 	m_characterName.setFont(m_mariofont);
-	m_characterName.setString("Active");
+	m_characterName.setString("Mobile");
 	m_characterName.setStyle(sf::Text::Underlined | sf::Text::Italic | sf::Text::Bold);
 	m_characterName.setPosition(40.0f, 40.0f);
 	m_characterName.setCharacterSize(80U);
@@ -358,7 +396,7 @@ void Game::setupSprite()
 
 	m_setuSprite.setTexture(m_setuTexture);
 	m_setuSprite.setOrigin(64.0f, 64.0f);
-	m_setuSprite.setPosition(m_setuWaypoints[2]); // instead, should be using m_setuposition
+	m_setuSprite.setPosition(m_setuWaypoints[1]); // instead, should be using m_setuposition
 
 	m_eBallSprite.setTexture(m_eBallTexture);
 	m_eBallSprite.setOrigin(16.0f, 16.0f);
@@ -388,6 +426,16 @@ void Game::setupSounds()
 		std::cout << "Failed to load 'luigi.wav'\n";
 	}
 
+	if (!m_resetSound.loadFromFile("ASSETS\\SOUNDS\\bicycle-horn-1.wav"))
+	{
+		std::cout << "Failed to load 'bicycle-horn-1.wav'\n";
+	}
+
+	if (!m_eBallFiringSnd.loadFromFile("ASSETS\\SOUNDS\\Laser 1.wav"))
+	{
+		std::cout << "Failed to load 'Laser 1.wav'\n";
+	}
+
 	if (!m_music_angelAttack.openFromFile("ASSETS\\SOUNDS\\03 - ANGEL ATTACK.flac"))
 	{// Simple error message if load fails.
 		std::cout << "Failed to load 'angel attack' bgm\n";
@@ -396,6 +444,8 @@ void Game::setupSounds()
 	m_music_angelAttack.play();
 
 	m_soundSource_charName.setBuffer(m_snd_exclaimMario);
+
+	m_eBallFiringSoundSource.setBuffer(m_eBallFiringSnd);
 }
 
 void Game::changeCharacter()
@@ -403,7 +453,7 @@ void Game::changeCharacter()
 	m_ImMario = !m_ImMario; // Toggle whether you are or are not Mario.
 	if (m_ImMario)
 	{
-		m_characterName.setString("Active");
+		m_characterName.setString("Mobile");
 		m_characterName.setFillColor(sf::Color::Red);
 		m_characterName.setOutlineColor(sf::Color::Green);
 		m_marioSprite.setTextureRect(sf::IntRect{ 0,0,64,148 }); // Mario is to left of 128 width texture, so rect starts at x0.
@@ -448,4 +498,20 @@ bool Game::collidingWithBounds(float bot, float top, float left, float rigt)
 	{
 		return false;
 	}
+}
+
+void Game::reset()
+{
+	m_music_angelAttack.play();
+
+	m_soundSourceReset.setBuffer(m_resetSound);
+	m_soundSourceReset.play();
+
+	m_setuPosIndex = 2;
+	m_setuSprite.setPosition(m_setuWaypoints[1]);
+
+	m_eBallTravelling = false;
+
+	m_location		= M_MARIO_STARTPOS;		// Mario start pos for reset
+	m_marioSprite.setPosition(m_location);
 }
