@@ -1,9 +1,11 @@
 /// <summary>
 /// @author RoBert McGregor LOGIN: c00302210
-/// START:  19th Jan 2024	END: ???
-/// EST:	4 hours?		ACTUAL:
-/// KNOWN BUGS: 
-///
+/// START:  19th Jan 2024	END: 01st Feb 2024
+/// EST:	4 hours?		ACTUAL: Too long, but I had fun with it.
+/// KNOWN BUGS: Program exits on player win, no time to make it better. 
+///	If the player just books it for the exit, they'll win.
+/// No player anticipation.
+/// 
 /// you need to change the above lines or lose marks <= Roger, wilco.
 /// </summary>
 
@@ -464,6 +466,7 @@ void Game::setupSounds()
 	{// Simple error message if load fails.
 		std::cout << "Failed to load 'angel attack' bgm\n";
 	}
+	m_music_angelAttack.setVolume(25);
 	m_music_angelAttack.setLoop(true);
 	m_music_angelAttack.play();
 
