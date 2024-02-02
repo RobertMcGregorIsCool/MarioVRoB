@@ -79,16 +79,15 @@ private:
 	sf::Sprite			m_logoSprite;						// sprite used for sfml logo
 	sf::Sprite			m_playfieldSprite;					// sprite used for playfield
 
-	// TopLeft 80.0f, 10.0f, TopRigt 600.0f, 10.0f, BotLef 80.0f, 440.0f, BotRit 600.0f, 440.0f
 	std::array<sf::Vector2f, 4> m_setuWaypoints = { sf::Vector2f(144.0f, 74.0f), sf::Vector2f(664.0f, 74.0f), sf::Vector2f(664.0f, 504.0f), sf::Vector2f(144.0f, 504.0f) };
-	const float			M_SETU_WAYPOINT_THRESHOLD = 8.0f;
+	const float			M_SETU_WAYPOINT_THRESHOLD = 8.0f;	// At or less than this distance to the waypoint, the SETU monster moves to the next waypoint.
 	const float			M_SETU_HIT_THRESH = 9000.0f;		// At or less than this distance to the player, the ball hits the player.
 	sf::Texture			m_setuTexture;						// Texture of SETUMonster
 	sf::Sprite			m_setuSprite;						// Sprite for SETUMonster
 	sf::Vector2f		m_setuPosition = m_setuWaypoints[1];// Position of SETUMonster
 	int					m_setuPosIndex	= 2;				// Index to step through Setu Waypoints
 	sf::Vector2f		m_setuDirection{ 0.0f, 0.0f };
-	const float			M_SETU_MOVE_SPEED = 1.1f;
+	const float			M_SETU_MOVE_SPEED = 1.1f;			// Jusst a little faster than the player.
 
 	bool				m_eBallTravelling = false;
 	const float			M_E_BALL_RESET_DIST = 500000.0f;	// At this distance from SETU Monster, ball teleports to SETU Monster
@@ -109,7 +108,11 @@ private:
 	const sf::Vector2f	M_MARIO_STARTPOS{ 120.0f, 500.0f }; // Mario start pos for reset
 	sf::Vector2f		m_lastValidPos	{ 0.0f, 0.0f };		// Last valid position while not touching collider.
 	sf::Vector2f		m_spriteOffset	{ 32.0f, 74.0f };
-	bool				m_ImMario		{ true };			// Why is THIS in curly braces?
+	bool				m_ImMario		{ true };			// Why are these values in curly braces? Something to ask Pete!
+	const float			m_marioBot		= 0.35f;
+	const float			m_marioTop		= 0.4f;
+	const float			m_marioLft		= 0.75f;
+	const float			m_marioRgt		= 0.25f;
 
 	Direction			m_direction = Direction::None;	// Where is mario going
 
@@ -118,11 +121,10 @@ private:
 	sf::Sound			m_soundSource_charName;				// Sound emitter for character name
 
 	sf::Music			m_music_angelAttack;				// 'Angel Attack' theme from Evangelion
-	sf::SoundBuffer		m_resetSound;
-	sf::Sound			m_soundSourceReset;
+	sf::SoundBuffer		m_resetSound;						// Horn if player dies
+	sf::Sound			m_soundSourceReset;					// Separate source for reset to not cut off Mario/Luigi
 
 	sf::RectangleShape	m_rectangleShape;					// Central collision obstacle over SETU
-	sf::RectangleShape	m_rectDebug;						// Tool to help designer identify relevant screen space numbers
 
 	sf::Color			m_clearColor{ 255,0,0,0 };			// Transparent 'color' for m_rectangleShape
 

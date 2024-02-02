@@ -17,11 +17,11 @@
 /// </summary>
 Game::Game() :
 	m_window{ sf::VideoMode{ 800U, 600U, 32U }, "I SEE YOU" },
-	m_exitGame{false} //when true game will exit
+	m_exitGame{false}	//when true game will exit
 {
 	setupFontAndText(); // load font 
-	setupSprite(); // load texture
-	setupSounds(); // Load sounds, prep speaker.
+	setupSprite();		// load texture
+	setupSounds();		// Load sounds, prep speaker.
 }
 
 /// <summary>
@@ -31,7 +31,6 @@ Game::Game() :
 Game::~Game()
 {
 }
-
 
 /// <summary>
 /// main game loop
@@ -81,7 +80,6 @@ void Game::processEvents()
 	}
 }
 
-
 /// <summary>
 /// deal with key presses from the user
 /// </summary>
@@ -94,7 +92,7 @@ void Game::processKeys(sf::Event t_event)
 	}
 
 	if (sf::Keyboard::Space == t_event.key.code)
-	{ // I've changed a lot here, but am retaining Pete's original naming where possible. Hope that's the right approach!
+	{ // Changed a lot here, retaining Pete's orig naming where possible. Hope that's right approach!
 		changeCharacter();
 	}
 	if (sf::Keyboard::Enter == t_event.key.code)
@@ -128,17 +126,15 @@ void Game::update(sf::Time t_deltaTime)
 void Game::render()
 {
 	if (m_ImMario)
-	{// Basics of Ikaruga effect.
+	{// If player switches to 'Ghost' mode, turn off background draw in order to get a trails effect
 		m_window.clear(sf::Color::White);
 		m_window.draw(m_playfieldSprite);
 	}
 
-	//m_window.draw(m_welcomeMessage);	// Used comments to get rid of this. I WOULD use 'Debug', but this project is all Debug atm.
-	// m_window.draw(m_logoSprite);
+	//m_window.draw(m_welcomeMessage);	// Commented out - WOULD use 'Debug', but ALL Debug atm.
+	//m_window.draw(m_logoSprite);
 
-	// m_window.draw(m_rectangleShape); // This exists for number reference, but is not drawn.
-
-	m_window.draw(m_characterName);		// Probably replacing this with a status indicator for player char.
+	m_window.draw(m_characterName);		// Replaced w/stat indic for player (ie. 'Mobile' 'Ghost')
 
 	m_window.draw(m_marioSprite);
 
@@ -146,18 +142,19 @@ void Game::render()
 
 	m_window.draw(m_eBallSprite);
 
-	//m_window.draw(m_rectDebug); // Turn this off when I've found the right values.
-
 	m_window.display();
 }
 
+/// <summary>
+/// Check player touching a wall/obj - if no, move player. If so, do not move or move back a bit
+/// </summary>
 void Game::move()
 {
 	sf::Vector2f movement{ 0.0f, 0.0f };
-	float playerBot		= m_location.y + (m_marioSprite.getLocalBounds().height * 0.35f); //0.85
-	float playerTop		= m_location.y + (m_marioSprite.getLocalBounds().height * 0.4f);  //0.4
-	float playerLeft	= m_location.x - (m_marioSprite.getLocalBounds().width * 0.75f);
-	float playerRigt	= m_location.x - (m_marioSprite.getLocalBounds().width * 0.25f);
+	float playerBot		= m_location.y + (m_marioSprite.getLocalBounds().height * m_marioBot); // Get player edge ref for wall collisions
+	float playerTop		= m_location.y + (m_marioSprite.getLocalBounds().height * m_marioTop);
+	float playerLeft	= m_location.x - (m_marioSprite.getLocalBounds().width * m_marioLft);
+	float playerRigt	= m_location.x - (m_marioSprite.getLocalBounds().width * m_marioRgt);
 
 	switch (m_direction)
 	{
@@ -165,21 +162,21 @@ void Game::move()
 		break;
 	case Direction::Up:
 		if (playerBot > 0.0f)
-		{
+		{// If the bottom of the player is not touching the top of the screen...
 			if (!collidingWithBounds(playerBot, playerTop, playerLeft, playerRigt))
 			{
 				m_lastValidPos = m_location;
-				movement.y = -m_moveSpeed;
+				movement.y = -m_moveSpeed; // Setup target movement
 			}
 			else
-			{
+			{// Player touching a wall? Teleport back to prev pos (before bad wall touch)
 				m_location = m_lastValidPos;
 			}
 		}
 		break;
 	case Direction::Down:
 		if (playerTop < m_window.getSize().y)
-		{
+		{// If the top of the player is not lower than the bottom of the screen...
 			if (!collidingWithBounds(playerBot, playerTop, playerLeft, playerRigt))
 			{
 				m_lastValidPos = m_location;
@@ -224,18 +221,20 @@ void Game::move()
 	}
 
 	if (m_ImMario)
-	{
+	{// If player is 'Mobile' (m_ImMario == true), use movement values to set MarioSprite pos.
 		m_location += movement;
 		m_marioSprite.setPosition(m_location);
 	}
 }
 
+/// <summary>
+/// From update, moves SETU logo to waypoints, increasing waypoint index when close to current targ
+/// </summary>
 void Game::setuMovement()
 {
-	m_setuDirection = { 0.0f, 0.0f }; // This shouldn't be required?
-	m_setuDirection = m_setuWaypoints[m_setuPosIndex] - m_setuSprite.getPosition();
+	m_setuDirection	= m_setuWaypoints[m_setuPosIndex] - m_setuSprite.getPosition();
 	m_setuDirection = normalizeV2f(m_setuDirection);
-	m_setuPosition = m_setuSprite.getPosition() + m_setuDirection * M_SETU_MOVE_SPEED;
+	m_setuPosition	= m_setuSprite.getPosition() + m_setuDirection * M_SETU_MOVE_SPEED;
 	m_setuSprite.setPosition(m_setuPosition);
 
 	if (vector2fSqrMag(m_setuWaypoints[m_setuPosIndex], m_setuSprite.getPosition()) < M_SETU_WAYPOINT_THRESHOLD)
@@ -251,10 +250,13 @@ void Game::setuMovement()
 	}
 }
 
+/// <summary>
+/// From update, moves energyball towards player, teleports back if too far from SETU monster
+/// </summary>
 void Game::eBallMovement()
 {
-	if (!m_eBallTravelling || vector2fSqrMag(m_setuSprite.getPosition(), m_eBallSprite.getPosition()) > M_E_BALL_RESET_DIST)//distance is too great
-	{
+	if (!m_eBallTravelling || vector2fSqrMag(m_setuSprite.getPosition(), m_eBallSprite.getPosition()) > M_E_BALL_RESET_DIST)
+	{// distance is too great
 		m_eBallTravelling = true;
 		m_eBallSprite.setPosition(m_setuSprite.getPosition()); // Reset on top of SETU Monster
 		m_eBallDirection = m_marioSprite.getPosition() - m_eBallSprite.getPosition();
@@ -269,6 +271,9 @@ void Game::eBallMovement()
 	}
 }
 
+/// <summary>
+/// If energyball within threshold distance of Mario in mobile mode, call reset
+/// </summary>
 void Game::eBallCollision()
 {
 	if (vector2fSqrMag(m_marioSprite.getPosition(), m_eBallSprite.getPosition()) < M_E_BALL_HIT_THRESH)
@@ -277,6 +282,9 @@ void Game::eBallCollision()
 	}
 }
 
+/// <summary>
+/// If SETU logo is within threshold distance of Mario, call reset
+/// </summary>
 void Game::setuCollision()
 {
 	if (vector2fSqrMag(m_marioSprite.getPosition(), m_setuSprite.getPosition()) < M_SETU_HIT_THRESH)
@@ -285,6 +293,9 @@ void Game::setuCollision()
 	}
 }
 
+/// <summary>
+/// If Mario is close enough to safe zone, end the game. Would be nice to celebrate, but time is low
+/// </summary>
 void Game::safeCollision()
 {
 	if (vector2fSqrMag(m_marioSprite.getPosition(), sf::Vector2f(800.0f, 600.0f)) < M_SETU_HIT_THRESH)
@@ -293,29 +304,43 @@ void Game::safeCollision()
 	}
 }
 
-sf::Vector2f Game::normalizeV2f(const sf::Vector2f source) // NOT MY CODE. https://en.sfml-dev.org/forums/index.php?topic=1488.0 (bottom of page)
-{// However, SFML 3 apparently will have a built-in utillity function for normalising vectors, so...!
-	float length = sqrt((source.x * source.x) + (source.y * source.y));
+/// <summary>
+/// Turns bad vector2 numbers into nice normalised numbers
+/// </summary>
+/// <param name="source">Scaled vector 2d</param>
+/// <returns>Nice normal'd vector2f</returns>
+sf::Vector2f Game::normalizeV2f(const sf::Vector2f t_source)
+{// SFML 3 apparently will have a built-in utillity function for normalising vectors, so...!
+	float length = sqrt((t_source.x * t_source.x) + (t_source.y * t_source.y));
 	if (length != 0)
-		return sf::Vector2f(source.x / length, source.y / length);
+		return sf::Vector2f(t_source.x / length, t_source.y / length);
 	else
-		return source;
+		return t_source;
 }
 
-float Game::vector2fSqrMag(const sf::Vector2f posA, const sf::Vector2f posB, const bool printDist)
+/// <summary>
+/// Get the 'distance' between two points (faster than also doing sqrt)
+/// </summary>
+/// <param name="posA">Starting point</param>
+/// <param name="posB">Ending point</param>
+/// <param name="printDist">Option to read off the right distances from console</param>
+/// <returns>Squared distance between two Vector2f points</returns>
+float Game::vector2fSqrMag(const sf::Vector2f t_posA, const sf::Vector2f t_posB, const bool t_printDist)
 {
-	sf::Vector2f dist = posA - posB;
+	sf::Vector2f dist = t_posA - t_posB;
 
 	float sqrMag = (dist.x * dist.x) + (dist.y * dist.y);
 
-	if (printDist)
+	if (t_printDist)
 	{
 		std::cout << "Distance is " << sqrMag << ".\n\n";
 	}
-
 	return sqrMag;
 }
 
+/// <summary>
+/// Check for/get keyboard input from arrow keys and WASD
+/// </summary>
 void Game::checkDirection()
 {
 	m_direction = Direction::None;
@@ -347,7 +372,7 @@ void Game::setupFontAndText()
 		std::cout << "problem loading SuperMario256 font" << std::endl;
 	}
 	m_characterName.setFont(m_mariofont);
-	m_characterName.setString("Mobile");
+	m_characterName.setString("Mobile"); // Hopefully this explains why you can only move as 'mario'
 	m_characterName.setStyle(sf::Text::Underlined | sf::Text::Italic | sf::Text::Bold);
 	m_characterName.setPosition(40.0f, 40.0f);
 	m_characterName.setCharacterSize(80U);
@@ -357,7 +382,7 @@ void Game::setupFontAndText()
 }
 
 /// <summary>
-/// load the texture and setup the sprite for the logo
+/// load the texture and setup the sprite for the logo, characters, background...
 /// </summary>
 void Game::setupSprite()
 {
@@ -403,17 +428,16 @@ void Game::setupSprite()
 	m_eBallSprite.setPosition(m_eBallPosition);
 
 	m_logoSprite.setTexture(m_logoTexture);
-	m_logoSprite.setPosition(300.0f, 180.0f);		// So I need to change this stuff so the text follows the character around.
+	m_logoSprite.setPosition(300.0f, 180.0f);// Need to change stuff so text follows the char around.
 
 	m_rectangleShape.setSize(sf::Vector2f(256.0f, 256.0f));
 	m_rectangleShape.setPosition((m_window.getSize().x * 0.5f) - m_rectangleShape.getSize().x * 0.5f, (m_window.getSize().y * 0.5f) - m_rectangleShape.getSize().y * 0.5f);
-	m_rectangleShape.setFillColor(m_clearColor);	// Previously used sf::Color::Cyan . Currently using bounds of shape for collision.
-
-	m_rectDebug.setSize(sf::Vector2f(256.0f, 4.0f));
-	m_rectDebug.setPosition((m_window.getSize().x * 0.5f) - m_rectDebug.getSize().x * 0.5f, m_rectangleShape.getGlobalBounds().top + m_rectangleShape.getGlobalBounds().height);
-	m_rectDebug.setFillColor(sf::Color::Red);
+	m_rectangleShape.setFillColor(m_clearColor);	// Currently using bounds of shape for collision.
 }
 
+/// <summary>
+/// Load sounds and music for game
+/// </summary>
 void Game::setupSounds()
 {
 	if (!m_snd_exclaimMario.loadFromFile("ASSETS\\SOUNDS\\mario.wav"))
@@ -448,15 +472,18 @@ void Game::setupSounds()
 	m_eBallFiringSoundSource.setBuffer(m_eBallFiringSnd);
 }
 
+/// <summary>
+/// Originally this changed Mario to Luigi and vice versa. Now it powers an Ikaruga-style mechanic.
+/// </summary>
 void Game::changeCharacter()
-{// Originally this changed Mario to Luigi and vice versa. Now it powers an Ikaruga-style mechanic.
+{
 	m_ImMario = !m_ImMario; // Toggle whether you are or are not Mario.
 	if (m_ImMario)
 	{
 		m_characterName.setString("Mobile");
 		m_characterName.setFillColor(sf::Color::Red);
 		m_characterName.setOutlineColor(sf::Color::Green);
-		m_marioSprite.setTextureRect(sf::IntRect{ 0,0,64,148 }); // Mario is to left of 128 width texture, so rect starts at x0.
+		m_marioSprite.setTextureRect(sf::IntRect{ 0,0,64,148 }); // Mario left of 128w text, rect starts@ x0.
 		centerText();
 
 		m_soundSource_charName.setBuffer(m_snd_exclaimMario);
@@ -467,7 +494,7 @@ void Game::changeCharacter()
 		m_characterName.setString("Ghost");
 		m_characterName.setFillColor(sf::Color::Green);
 		m_characterName.setOutlineColor(sf::Color::Red);
-		m_marioSprite.setTextureRect(sf::IntRect{ 64,0,64,148 });// Luigi is to right of 128 width texture, so rect starts at x64 (hor middle).
+		m_marioSprite.setTextureRect(sf::IntRect{ 64,0,64,148 });// Luigi right of 128w text, rect starts@ x64 (hor mid).
 		centerText();
 
 		m_soundSource_charName.setBuffer(m_snd_exclaimLuigi);
@@ -475,22 +502,33 @@ void Game::changeCharacter()
 	}
 }
 
+/// <summary>
+/// Centers the status text. Ideally we'd call this at the start, but we're doing this later to demo to Pete that text is movable
+/// </summary>
 void Game::centerText()
-{
+{// In ideal world, I'd have time to make this more generic
 	sf::Vector2f location{ 0.0f, 0.0f };
 	location.y = 50.0f;
 	location.x = 400 - (m_characterName.getGlobalBounds().width / 2);
 	m_characterName.setPosition(location);
 }
 
-bool Game::collidingWithBounds(float bot, float top, float left, float rigt)
+/// <summary>
+/// My ugly home-grown collision detection code
+/// </summary>
+/// <param name="bot">Position of player bottom</param>
+/// <param name="top">Position of player top</param>
+/// <param name="left">Position of player left</param>
+/// <param name="rigt">Position of player right</param>
+/// <returns>True of colliding, false if not colliding</returns>
+bool Game::collidingWithBounds(float t_bot, float t_top, float t_left, float t_rigt)
 {
 	float rectTop	= m_rectangleShape.getGlobalBounds().top;
 	float rectBot	= rectTop + m_rectangleShape.getGlobalBounds().height;
 	float rectLeft	= m_rectangleShape.getGlobalBounds().left;
 	float rectRigt	= rectLeft + m_rectangleShape.getGlobalBounds().width;
 
-	if ((bot < rectBot && bot > rectTop) && (left < rectRigt && rigt > rectLeft))
+	if ((t_bot < rectBot && t_bot > rectTop) && (t_left < rectRigt && t_rigt > rectLeft))
 	{
 		return true;
 	}
@@ -500,6 +538,9 @@ bool Game::collidingWithBounds(float bot, float top, float left, float rigt)
 	}
 }
 
+/// <summary>
+/// Resets the game to default vars - used if player 'dies'.
+/// </summary>
 void Game::reset()
 {
 	m_music_angelAttack.play();
